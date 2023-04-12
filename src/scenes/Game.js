@@ -34,7 +34,7 @@ export default class Game extends Phaser.Scene {
         }
 
         this.player = this.physics.add.sprite(240, 320, 'bunny-stand').setScale(0.5);
-        this.physics.add.collider(platforms, this.player);
+        this.physics.add.collider(this.platforms, this.player);
 
         //Phaser.Physics.body class has a checkCollision property 
         //where we can set which directionswe want collision for.
@@ -45,15 +45,26 @@ export default class Game extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player)
     }
-    
+
     update() {
         // find out from Arcade Physics if the player's physics body
         // is toucing something below it.
 
         const touchingDown = this.player.body.touching.down;
-        
+
         if (touchingDown) {
             this.player.setVelocity(-300);
         }
+
+        this.platforms.children.iterate(child => {
+            /** @type {Phaser.Physics.Arcade.Sprite} */
+            const platform = child
+
+            const scrollY = this.cameras.main.scrollY
+            if (platform.y >= scrollY + 700) {
+                platform.y = scrollY - Phaser.Math.Between(50, 100)
+                platform.body.updateFromGameObject()
+            }
+        })
     }
 }
